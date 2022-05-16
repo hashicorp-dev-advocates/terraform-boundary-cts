@@ -1,53 +1,39 @@
-locals {
-  # Group service instances by service name
-  consul_services = {
-    for id, s in var.services : s.name => s...
-  }
-}
+resource "boundary_host_catalog_static" "host_catalog" {
 
-resource "boundary_host_catalog" "host_catalog" {
 
-  for_each = var.services
-
-  name        = each.value["name"]
-  description = "${each.value["name"]} host catalog created by Consul Terraform Sync"
-  type        = "static"
+  name        = var.service_name
+  description = "${var.service_name} host catalog created by Consul Terraform Sync"
   scope_id    = var.project_scope_id
 }
 
-resource "boundary_host" "host" {
+resource "boundary_host_static" "host" {
 
-  for_each = var.services
-
-  name            = each.value["name"]
-  description     = "${each.value["name"]} host created by Consul Terraform Sync"
-  host_catalog_id = boundary_host_catalog.host_catalog[each.key].id
-  address         = each.value["address"]
+  name            = var.service_name
+  description     = "${var.service_name} host created by Consul Terraform Sync"
+  host_catalog_id = boundary_host_catalog_static.host_catalog.id
+  address         = var.service_address
 
   type = "static"
 }
 
-resource "boundary_host_set" "host_set" {
-  for_each = var.services
-
-  name            = each.value["name"]
-  description     = "${each.value["name"]} host set created by Consul Terraform Sync"
-  host_catalog_id = boundary_host_catalog.host_catalog[each.key].id
+resource "boundary_host_set_static" "host_set" {
+  name            = var.service_name
+  description     = "${var.service_name} host set created by Consul Terraform Sync"
+  host_catalog_id = boundary_host_catalog_static.host_catalog.id
   type            = "static"
   host_ids = [
-    boundary_host.host[each.key].id
+    boundary_host_static.host.id
   ]
 }
 
 resource "boundary_target" "target" {
-  for_each = var.services
 
-  name         = each.value["name"]
+  name         = var.service_name
   type         = "tcp"
-  description  = "${each.value["name"]} target created by Consul Terraform Sync"
-  default_port = each.value["port"]
+  description  = "${var.service_name} target created by Consul Terraform Sync"
+  default_port = var.service_port
   scope_id     = var.project_scope_id
   host_source_ids = [
-    boundary_host_set.host_set[each.key].id
+    boundary_host_set_static.host_set.id
   ]
 }

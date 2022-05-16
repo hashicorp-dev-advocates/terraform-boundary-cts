@@ -1,32 +1,19 @@
-
-variable "services" {
-  description = "Consul services monitored by Consul-Terraform-Sync"
-  type = map(
-    object({
-      id        = string
-      name      = string
-      kind      = string
-      address   = string
-      port      = number
-      meta      = map(string)
-      tags      = list(string)
-      namespace = string
-      status    = string
-
-      node                  = string
-      node_id               = string
-      node_address          = string
-      node_datacenter       = string
-      node_tagged_addresses = map(string)
-      node_meta             = map(string)
-
-      cts_user_defined_meta = map(string)
-    })
-  )
-}
-
 variable "project_scope_id" {
   type        = string
   description = "Scope ID for Boundary project"
-  default     = "p_1234567890"
+}
+
+variable "service_name" {
+  type        = string
+  description = "Name of Consul Service to register as a host and target in Boundary."
+}
+
+variable "service_address" {
+  type        = string
+  description = "IP address or DNS name for Consul service to register as a host in Boundary."
+}
+
+variable "service_port" {
+  type        = number
+  description = "Port of Consul service to register as a target in Boundary."
 }

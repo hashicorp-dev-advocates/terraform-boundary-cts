@@ -1,3 +1,3 @@
-output "consul_services" {
-  value = local.consul_services
-}
+#output "consul_services" {
+#  value = local.consul_services
+#}
